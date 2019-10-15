@@ -165,11 +165,11 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 }
 
 resource "aws_iam_user" "s3_front_user" {
-  name  = "tf-ontex-${var.project}-${var.env}-s3-front-user"
+  name = "tf-ontex-${var.project}-${var.env}-s3-front-user"
 }
 
 resource "aws_iam_access_key" "s3_front_user_key" {
-  user  = aws_iam_user.s3_front_user.name
+  user = aws_iam_user.s3_front_user.name
 }
 
 resource "aws_iam_policy" "s3_front_user" {
@@ -226,7 +226,7 @@ output "cloudfront_domain_name" {
 }
 
 output "s3_user_access_key_id" {
-  value     = aws_iam_access_key.s3_front_user_key.id
+  value = aws_iam_access_key.s3_front_user_key.id
 }
 
 output "s3_user_secret_access_key" {
