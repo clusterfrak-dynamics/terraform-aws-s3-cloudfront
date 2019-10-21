@@ -165,7 +165,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 }
 
 resource "aws_iam_user" "s3_front_user" {
-  name = "tf-ontex-${var.project}-${var.env}-s3-front-user"
+  name = "tf-${var.prefix}-${var.project}-${var.env}-s3-front-user"
 }
 
 resource "aws_iam_access_key" "s3_front_user_key" {
@@ -173,7 +173,7 @@ resource "aws_iam_access_key" "s3_front_user_key" {
 }
 
 resource "aws_iam_policy" "s3_front_user" {
-  name        = "tf-ontex-${var.project}-${var.env}-s3-front-user-policy"
+  name        = "tf-${var.prefix}-${var.project}-${var.env}-s3-front-user-policy"
   path        = "/"
   description = "S3 Healthcare front access"
 

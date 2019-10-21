@@ -23,3 +23,7 @@ variable "custom_tags" {
 variable "project" {
   default = ""
 }
+
+variable "prefix" {
+  default = ""
+}
