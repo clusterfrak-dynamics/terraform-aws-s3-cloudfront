@@ -29,6 +29,30 @@ resource "aws_route53_record" "s3_distribution_v6" {
   }
 }
 
+resource "aws_s3_bucket" "log_bucket" {
+  count  = var.front["log_bucket_name"] == "" ? 0 : 1
+  bucket = var.front["log_bucket_name"]
+  acl    = "log-delivery-write"
+
+  tags = merge(local.common_tags, var.custom_tags)
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "aws:kms"
+      }
+    }
+  }
+
+  lifecycle_rule {
+    enabled = true
+
+    noncurrent_version_expiration {
+      days = var.front["log_bucket_expiration_days"]
+    }
+  }
+}
+
 resource "aws_s3_bucket" "front" {
   bucket = var.front["bucket_name"]
   acl    = "private"
@@ -36,6 +60,14 @@ resource "aws_s3_bucket" "front" {
   website {
     index_document = "index.html"
     error_document = "index.html"
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "aws:kms"
+      }
+    }
   }
 
   tags = merge(local.common_tags, var.custom_tags)
@@ -99,7 +131,6 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = var.front["origin_access_identity_comment"]
 }
 
-
 resource "aws_cloudfront_distribution" "s3_distribution" {
 
   origin {
@@ -114,8 +145,17 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
+  wait_for_deployment = var.front["wait_for_deployment"]
 
   aliases = var.front["aliases"] != [] ? var.front["aliases"] : null
+
+  dynamic "logging_config" {
+    for_each = var.front["log_bucket_name"] == "" ? [] : list("logging_config")
+    content {
+      include_cookies = false
+      bucket          = aws_s3_bucket.log_bucket[0].bucket_domain_name
+    }
+  }
 
   custom_error_response {
     error_caching_min_ttl = 300
