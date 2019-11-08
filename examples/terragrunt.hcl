@@ -23,9 +23,9 @@ inputs = {
   }
 
   dns = {
-    use_route53 = false
-    domain_name = "domain.name"
-    hostname    = "frontend.domain.name"
+    use_route53    = false
+    hosted_zone_id = "zone_id"
+    hostname       = "frontend.domain.name"
   }
 
   custom_tags = merge(

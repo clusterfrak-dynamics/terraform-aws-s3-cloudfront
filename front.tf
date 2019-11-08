@@ -5,7 +5,7 @@ locals {
 
 resource "aws_route53_record" "s3_distribution_v4" {
   count   = var.dns["use_route53"] ? 1 : 0
-  zone_id = data.aws_route53_zone.main[count.index].zone_id
+  zone_id = var.dns["hosted_zone_id"]
   name    = var.dns["hostname"]
   type    = "A"
 
@@ -18,7 +18,7 @@ resource "aws_route53_record" "s3_distribution_v4" {
 
 resource "aws_route53_record" "s3_distribution_v6" {
   count   = var.dns["use_route53"] ? 1 : 0
-  zone_id = data.aws_route53_zone.main[count.index].zone_id
+  zone_id = var.dns["hosted_zone_id"]
   name    = var.dns["hostname"]
   type    = "AAAA"
 
