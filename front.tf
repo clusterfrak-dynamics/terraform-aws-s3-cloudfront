@@ -266,16 +266,3 @@ resource "aws_iam_user_policy_attachment" "s3_front_user" {
   user       = aws_iam_user.s3_front_user.name
   policy_arn = aws_iam_policy.s3_front_user.arn
 }
-
-output "cloudfront_domain_name" {
-  value = aws_cloudfront_distribution.s3_distribution.domain_name
-}
-
-output "s3_user_access_key_id" {
-  value = aws_iam_access_key.s3_front_user_key.id
-}
-
-output "s3_user_secret_access_key" {
-  value     = aws_iam_access_key.s3_front_user_key.secret
-  sensitive = true
-}
