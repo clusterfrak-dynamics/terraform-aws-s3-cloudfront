@@ -159,7 +159,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   dynamic "custom_error_response" {
     for_each = var.front["custom_error_response"]
-    content  {
+    content {
       error_caching_min_ttl = lookup(custom_error_response.value, "error_caching_min_ttl", null)
       error_code            = lookup(custom_error_response.value, "error_code", null)
       response_code         = lookup(custom_error_response.value, "response_code", null)
