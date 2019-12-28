@@ -44,5 +44,21 @@ inputs = {
     acm_arn                        = null
     minimum_protocol_version       = "TLSv1"
     ssl_support_method             = "sni-only"
+    index_document                 = "index.html"
+    error_document                 = null
+    custom_error_response          = [
+      {
+        error_caching_min_ttl = 300
+        error_code            = 403
+        response_code         = 200
+        response_page_path    = "/index.html"
+      },
+      {
+        error_caching_min_ttl = 300
+        error_code            = 404
+        response_code         = 200
+        response_page_path    = "/index.html"
+      }
+    ]
   }
 }

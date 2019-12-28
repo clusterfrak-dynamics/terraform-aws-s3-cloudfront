@@ -58,8 +58,8 @@ resource "aws_s3_bucket" "front" {
   acl    = "private"
 
   website {
-    index_document = "index.html"
-    error_document = "index.html"
+    index_document = var.front["index_document"]
+    error_document = var.front["error_document"]
   }
 
   server_side_encryption_configuration {
@@ -157,18 +157,14 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 
-  custom_error_response {
-    error_caching_min_ttl = 300
-    error_code            = 403
-    response_code         = 200
-    response_page_path    = "/index.html"
-  }
-
-  custom_error_response {
-    error_caching_min_ttl = 300
-    error_code            = 404
-    response_code         = 200
-    response_page_path    = "/index.html"
+  dynamic "custom_error_response" {
+    for_each = var.front["custom_error_response"]
+    content  {
+      error_caching_min_ttl = lookup(custom_error_response.value, "error_caching_min_ttl", null)
+      error_code            = lookup(custom_error_response.value, "error_code", null)
+      response_code         = lookup(custom_error_response.value, "response_code", null)
+      response_page_path    = lookup(custom_error_response.value, "response_page_path", null)
+    }
   }
 
   default_cache_behavior {
