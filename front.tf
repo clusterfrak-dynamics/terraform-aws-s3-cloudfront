@@ -4,9 +4,9 @@ locals {
 }
 
 resource "aws_route53_record" "s3_distribution_v4" {
-  count   = var.dns["use_route53"] ? 1 : 0
+  count   = length(var.dns["hostnames"])
   zone_id = var.dns["hosted_zone_id"]
-  name    = var.dns["hostname"]
+  name    = var.dns["hostnames"][count.index]
   type    = "A"
 
   alias {
@@ -17,9 +17,9 @@ resource "aws_route53_record" "s3_distribution_v4" {
 }
 
 resource "aws_route53_record" "s3_distribution_v6" {
-  count   = var.dns["use_route53"] ? 1 : 0
+  count   = length(var.dns["hostnames"])
   zone_id = var.dns["hosted_zone_id"]
-  name    = var.dns["hostname"]
+  name    = var.dns["hostnames"][count.index]
   type    = "AAAA"
 
   alias {
@@ -207,7 +207,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 }
 
 resource "aws_iam_user" "s3_front_user" {
-  name = "tf-${var.prefix}-${var.project}-${var.env}-s3-front-user"
+  name = "tf-${var.prefix}${var.prefix != "" ? "-" : ""}${var.project}${var.project != "" ? "-" : ""}${var.env}-s3-front-user"
 }
 
 resource "aws_iam_access_key" "s3_front_user_key" {
@@ -215,7 +215,7 @@ resource "aws_iam_access_key" "s3_front_user_key" {
 }
 
 resource "aws_iam_policy" "s3_front_user" {
-  name        = "tf-${var.prefix}-${var.project}-${var.env}-s3-front-user-policy"
+  name        = "tf-${var.prefix}${var.prefix != "" ? "-" : ""}${var.project}${var.project != "" ? "-" : ""}${var.env}-s3-front-user-policy"
   path        = "/"
   description = "S3 front access"
 
