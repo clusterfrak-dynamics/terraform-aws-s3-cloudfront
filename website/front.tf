@@ -136,7 +136,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "http-only"
-      origin_ssl_protocols    = [
+      origin_ssl_protocols = [
         "TLSv1",
         "TLSv1.1",
         "TLSv1.2"
@@ -145,7 +145,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   dynamic "origin" {
-    for_each                 = [for i in "${var.dynamic_custom_origin_config}" : {
+    for_each = [for i in "${var.dynamic_custom_origin_config}" : {
       name                   = i.domain_name
       id                     = i.origin_id
       path                   = i.origin_path
@@ -156,19 +156,19 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       custom_headers         = i.custom_headers
     }]
     content {
-      domain_name    = origin.value.name
-      origin_id      = origin.value.id
-      origin_path    = origin.value.path
+      domain_name = origin.value.name
+      origin_id   = origin.value.id
+      origin_path = origin.value.path
       custom_origin_config {
-        http_port                = origin.value.http_port
-        https_port               = origin.value.https_port
-        origin_protocol_policy   = origin.value.origin_protocol_policy
-        origin_ssl_protocols     = origin.value.origin_ssl_protocols
+        http_port              = origin.value.http_port
+        https_port             = origin.value.https_port
+        origin_protocol_policy = origin.value.origin_protocol_policy
+        origin_ssl_protocols   = origin.value.origin_ssl_protocols
       }
       dynamic "custom_header" {
-        for_each = [ for j in "${origin.value.custom_headers}" : {
-          name   = j.name
-          value  = j.value
+        for_each = [for j in "${origin.value.custom_headers}" : {
+          name  = j.name
+          value = j.value
         }]
         content {
           name  = custom_header.value.name
