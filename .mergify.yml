@@ -1,0 +1,11 @@
+pull_request_rules:
+  - name: Automatic merge on approval
+    conditions:
+      - "approved-reviews-by>=1"
+      - "check-success=Semantic Pull Request"
+      - "check-success=linter"
+      - "check-success=terraform:s3-cloudfront"
+      - "check-success=terraform:s3-cloudfront-website"
+    actions:
+      merge:
+        method: merge

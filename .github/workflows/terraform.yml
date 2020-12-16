@@ -1,0 +1,144 @@
+name: 'terraform-aws-s3-cloudfront'
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  linter:
+    name: 'linter'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Lint Code Base
+      uses: github/super-linter@v3
+      env:
+        VALIDATE_ALL_CODEBASE: false
+        DEFAULT_BRANCH: main
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VALIDATE_STATES: false
+        VALIDATE_KUBERNETES_KUBEVAL: false
+        VALIDATE_TERRAFORM_TERRASCAN: false
+
+    - name: 'slack:failure'
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v1
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: failure
+        color: danger
+
+  terraform-s3-cloudfront:
+    name: 'terraform:s3-cloudfront'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init -backend=false
+
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: 'slack:failure'
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v1
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: failure
+        color: danger
+
+  terraform-s3-cloudfront-website:
+    name: 'terraform:s3-cloudfront-website'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init -backend=false
+      working-directory: modules/website
+
+    - name: Terraform Format
+      run: terraform fmt -check
+      working-directory: modules/website
+
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: modules/website
+      env:
+        AWS_REGION: eu-west-3
+
+    - name: 'slack:failure'
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v1
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: failure
+        color: danger
+
+  terraform-release:
+    if: github.ref == 'refs/heads/main'
+    name: 'terraform:release'
+    runs-on: ubuntu-latest
+    needs:
+      - linter
+      - terraform-s3-cloudfront
+      - terraform-s3-cloudfront-website
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v2
+      with:
+        branches: |
+          [
+            'main'
+          ]
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 'slack:success'
+      if: success()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v1
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: SUCCESS
+        color: good
+
+    - name: 'slack:failure'
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v1
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: failure
+        color: danger

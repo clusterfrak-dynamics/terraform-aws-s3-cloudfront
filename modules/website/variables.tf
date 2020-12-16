@@ -16,7 +16,7 @@ variable "front" {
 }
 
 variable "custom_tags" {
-  type    = map
+  type    = map(any)
   default = {}
 }
 
@@ -29,11 +29,15 @@ variable "prefix" {
 }
 
 variable "dynamic_custom_origin_config" {
-  type    = list
+  type    = list(any)
   default = []
 }
 
 variable "dynamic_ordered_cache_behavior" {
-  type    = list
+  type    = list(any)
   default = []
+}
+
+variable "ssm_referer_key" {
+  default = "/cloudfront/default/referer"
 }

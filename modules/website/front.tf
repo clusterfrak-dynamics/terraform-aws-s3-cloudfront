@@ -70,6 +70,12 @@ resource "aws_s3_bucket" "front" {
     }
   }
 
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+  }
+
   tags = merge(local.common_tags, var.custom_tags)
 }
 
@@ -145,7 +151,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   dynamic "origin" {
-    for_each = [for i in "${var.dynamic_custom_origin_config}" : {
+    for_each = [for i in var.dynamic_custom_origin_config : {
       name                   = i.domain_name
       id                     = i.origin_id
       path                   = i.origin_path
@@ -166,7 +172,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
         origin_ssl_protocols   = origin.value.origin_ssl_protocols
       }
       dynamic "custom_header" {
-        for_each = [for j in "${origin.value.custom_headers}" : {
+        for_each = [for j in origin.value.custom_headers : {
           name  = j.name
           value = j.value
         }]
@@ -226,7 +232,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   dynamic "ordered_cache_behavior" {
-    for_each = [for i in "${var.dynamic_ordered_cache_behavior}" : {
+    for_each = [for i in var.dynamic_ordered_cache_behavior : {
       path_pattern           = i.path_pattern
       allowed_methods        = i.allowed_methods
       cached_methods         = i.cached_methods
