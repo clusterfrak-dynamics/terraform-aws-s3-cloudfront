@@ -16,7 +16,7 @@ variable "front" {
 }
 
 variable "custom_tags" {
-  type    = map
+  type    = map(any)
   default = {}
 }
 
