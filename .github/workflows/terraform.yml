@@ -56,6 +56,8 @@ jobs:
 
     - name: Terraform Validate
       run: terraform validate
+      env:
+        AWS_REGION: eu-west-3
 
     - name: 'slack:failure'
       if: failure()
