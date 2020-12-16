@@ -5,20 +5,23 @@
 
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| terraform | >= 0.13 |
+| aws | ~> 3.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
+| aws | ~> 3.0 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | aws | n/a | `any` | `{}` | no |
-| custom\_tags | n/a | `map` | `{}` | no |
+| custom\_tags | n/a | `map(any)` | `{}` | no |
 | dns | n/a | `any` | `{}` | no |
 | env | n/a | `any` | n/a | yes |
 | front | n/a | `any` | `{}` | no |
